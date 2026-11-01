@@ -50,6 +50,13 @@ namespace StudentManagementApp
                                     break;
                                 }
 
+                                // Check that the ID is positive
+                                if (id <= 0)
+                                {
+                                    Console.WriteLine("Student ID must be greater than 0!");
+                                    break;
+                                }
+
                                 if (service.StudentIdExists(id))
                                 {
                                     Console.WriteLine("Student ID already exists!");
@@ -172,5 +179,3 @@ namespace StudentManagementApp
         }
     }
 }
-
-
