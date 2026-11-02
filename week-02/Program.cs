@@ -21,6 +21,9 @@ namespace StudentManagementApp
                 return;
             }
 
+            Console.WriteLine("\nTotal Students: " + students.Count);
+            Console.WriteLine("----------------");
+
             foreach (Student st in students)
             {
                 Console.WriteLine("ID: " + st.Id);
