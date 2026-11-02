@@ -1,181 +1,133 @@
 ﻿
 using System;
+using System.Collections.Generic;
 
 namespace StudentManagementApp
 {
-    internal class Program
+    class StudentService
     {
-        static void Main(string[] args)
+        List<Student> students = new List<Student>();
+
+        public void AddStudent(Student student)
         {
-            StudentService service = new StudentService();
+            students.Add(student);
+        }
 
-            Student st1 = new Student(1, "Ahmad", 90);
-            Student st2 = new Student(2, "Omar", 85);
-            Student st3 = new Student(3, "Sara", 95);
-
-            service.AddStudent(st1);
-            service.AddStudent(st2);
-            service.AddStudent(st3);
-
-            while (true)
+        public void DisplayStudents()
+        {
+            if (students.Count == 0)
             {
-                Console.WriteLine("\n===== Student Management =====");
-                Console.WriteLine("1. Display Students");
-                Console.WriteLine("2. Add Student");
-                Console.WriteLine("3. Search Student");
-                Console.WriteLine("4. Update Student");
-                Console.WriteLine("5. Delete Student");
-                Console.WriteLine("0. Exit");
-                Console.Write("Enter your choice: ");
+                Console.WriteLine("No students found!");
+                return;
+            }
 
-                string choice = Console.ReadLine();
+            foreach (Student st in students)
+            {
+                Console.WriteLine("ID: " + st.Id);
+                Console.WriteLine("Name: " + st.Name);
+                Console.WriteLine("Grade: " + st.Grade);
+                Console.WriteLine("----------------");
+            }
+        }
 
-                try
+        public void SearchStudent(int id)
+        {
+            foreach (Student st in students)
+            {
+                if (st.Id == id)
                 {
-                    switch (choice)
-                    {
-                        case "1":
-                            {
-                                service.DisplayStudents();
-                                break;
-                            }
-
-                        case "2":
-                            {
-                                Console.Write("Enter Student ID: ");
-
-                                if (!int.TryParse(Console.ReadLine(), out int id))
-                                {
-                                    Console.WriteLine("Invalid ID!");
-                                    break;
-                                }
-
-                                // Check that the ID is positive
-                                if (id <= 0)
-                                {
-                                    Console.WriteLine("Student ID must be greater than 0!");
-                                    break;
-                                }
-
-                                if (service.StudentIdExists(id))
-                                {
-                                    Console.WriteLine("Student ID already exists!");
-                                    break;
-                                }
-
-                                Console.Write("Enter Student Name: ");
-                                string name = (Console.ReadLine() ?? "").Trim();
-
-                                if (string.IsNullOrWhiteSpace(name))
-                                {
-                                    Console.WriteLine("Student Name cannot be empty!");
-                                    break;
-                                }
-
-                                if (service.StudentNameExists(name))
-                                {
-                                    Console.WriteLine("Student Name already exists!");
-                                    break;
-                                }
-
-                                Console.Write("Enter Student Grade: ");
-
-                                if (!double.TryParse(Console.ReadLine(), out double grade)
-                                    || double.IsNaN(grade)
-                                    || double.IsInfinity(grade))
-                                {
-                                    Console.WriteLine("Invalid Grade!");
-                                    break;
-                                }
-
-                                if (grade < 0 || grade > 100)
-                                {
-                                    Console.WriteLine("Grade must be between 0 and 100!");
-                                    break;
-                                }
-
-                                Student newStudent = new Student(id, name, grade);
-
-                                service.AddStudent(newStudent);
-
-                                Console.WriteLine("Student Added Successfully!");
-                                break;
-                            }
-
-                        case "3":
-                            {
-                                Console.Write("Enter Student ID to search: ");
-
-                                if (!int.TryParse(Console.ReadLine(), out int searchId))
-                                {
-                                    Console.WriteLine("Invalid ID!");
-                                    break;
-                                }
-
-                                service.SearchStudent(searchId);
-                                break;
-                            }
-
-                        case "4":
-                            {
-                                Console.Write("Enter Student ID to update: ");
-
-                                if (!int.TryParse(Console.ReadLine(), out int updateId))
-                                {
-                                    Console.WriteLine("Invalid ID!");
-                                    break;
-                                }
-
-                                Console.Write("Enter New Name: ");
-                                string newName = Console.ReadLine() ?? "";
-
-                                Console.Write("Enter New Grade: ");
-
-                                if (!double.TryParse(Console.ReadLine(), out double newGrade)
-                                    || double.IsNaN(newGrade)
-                                    || double.IsInfinity(newGrade))
-                                {
-                                    Console.WriteLine("Invalid Grade!");
-                                    break;
-                                }
-
-                                service.UpdateStudent(updateId, newName, newGrade);
-                                break;
-                            }
-
-                        case "5":
-                            {
-                                Console.Write("Enter Student ID to delete: ");
-
-                                if (!int.TryParse(Console.ReadLine(), out int deleteId))
-                                {
-                                    Console.WriteLine("Invalid ID!");
-                                    break;
-                                }
-
-                                service.DeleteStudent(deleteId);
-                                break;
-                            }
-
-                        case "0":
-                            {
-                                Console.WriteLine("Goodbye!");
-                                return;
-                            }
-
-                        default:
-                            {
-                                Console.WriteLine("Invalid Choice!");
-                                break;
-                            }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("An unexpected error occurred!");
-                    Console.WriteLine("Error: " + ex.Message);
+                    Console.WriteLine("ID: " + st.Id);
+                    Console.WriteLine("Name: " + st.Name);
+                    Console.WriteLine("Grade: " + st.Grade);
+                    return;
                 }
             }
+
+            Console.WriteLine("Student Not Found!");
+        }
+
+        public void UpdateStudent(int id, string newName, double newGrade)
+        {
+            Student studentToUpdate = students.Find(st => st.Id == id);
+
+            if (studentToUpdate == null)
+            {
+                Console.WriteLine("Student Not Found!");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                Console.WriteLine("Student Name cannot be empty!");
+                return;
+            }
+
+            newName = newName.Trim();
+
+            if (newGrade < 0 || newGrade > 100 ||
+                double.IsNaN(newGrade) || double.IsInfinity(newGrade))
+            {
+                Console.WriteLine("Grade must be between 0 and 100!");
+                return;
+            }
+
+            foreach (Student st in students)
+            {
+                if (st.Id != id &&
+                    string.Equals(st.Name.Trim(), newName,
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Student Name already exists!");
+                    return;
+                }
+            }
+
+            studentToUpdate.Name = newName;
+            studentToUpdate.Grade = newGrade;
+
+            Console.WriteLine("Student Updated Successfully!");
+        }
+
+        public void DeleteStudent(int id)
+        {
+            Student studentToDelete = students.Find(st => st.Id == id);
+
+            if (studentToDelete != null)
+            {
+                students.Remove(studentToDelete);
+                Console.WriteLine("Student Deleted Successfully!");
+            }
+            else
+            {
+                Console.WriteLine("Student Not Found!");
+            }
+        }
+
+        public bool StudentIdExists(int id)
+        {
+            foreach (Student st in students)
+            {
+                if (st.Id == id)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool StudentNameExists(string name)
+        {
+            foreach (Student st in students)
+            {
+                if (string.Equals(st.Name.Trim(), name.Trim(),
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
